@@ -1,7 +1,7 @@
 package io.andr83.nimbus
 
 import java.time.format.DateTimeFormatter
-import java.time.{LocalDateTime, ZoneId}
+import java.time.{LocalDate, LocalDateTime, ZoneId}
 
 import com.softwaremill.sttp._
 import com.typesafe.scalalogging.LazyLogging
@@ -28,8 +28,9 @@ class EvoSharesJob(config: EvoSharesJob.Config) extends Job with LazyLogging {
       config.every.length,
       config.every.unit,
       () => {
+        val now = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
         val request = sttp.get(
-          uri"https://tools.eurolandir.com/tools/sharegraph/handlers/highstockdataintraday.aspx?callback=json&LanguageID=32&s=1166&isin=SE0006826046&market=7&p=OneDay&from=2018-02-23&to=2018-02-23&cur=SEK&ccode=S-EVO&ShareID=2380&currency=SEK&lang=en-US&curShow=&LanguageName=English"
+          uri"https://tools.eurolandir.com/tools/sharegraph/handlers/highstockdataintraday.aspx?callback=json&LanguageID=32&s=1166&isin=SE0006826046&market=7&p=OneDay&from=$now&to=$now&cur=SEK&ccode=S-EVO&ShareID=2380&currency=SEK&lang=en-US&curShow=&LanguageName=English"
         )
         val response = request.send()
         val res = for {
