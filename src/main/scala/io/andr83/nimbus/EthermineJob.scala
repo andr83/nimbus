@@ -59,6 +59,7 @@ class EthermineJob(config: EthermineJob.Config) extends Job with LazyLogging {
         res match {
           case PError(errors) =>
             errors.toList.foreach(e => logger.error(e.getMessage, e))
+            storage.errors("workers", errors)
           case _ =>
         }
       }
