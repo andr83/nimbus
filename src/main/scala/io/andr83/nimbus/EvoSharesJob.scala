@@ -1,11 +1,10 @@
 package io.andr83.nimbus
 
-import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.time.format.DateTimeFormatter
+import java.time.{LocalDateTime, ZoneId}
 
 import com.softwaremill.sttp._
 import com.typesafe.scalalogging.LazyLogging
-import io.andr83.nimbus.CoinbaseJob.Rate
 import io.andr83.nimbus.storage.Storage
 import io.parsek._
 import io.parsek.implicits._
@@ -39,7 +38,8 @@ class EvoSharesJob(config: EvoSharesJob.Config) extends Job with LazyLogging {
           data <- root.data.as[String](json)
         } yield {
           val parts = data.split("\\|").last.split(";")
-          val time = LocalDateTime.parse(parts(0), timeFormatter).toEpochSecond(ZoneOffset.UTC) * 1000
+          val dateTime = LocalDateTime.parse(parts(0), timeFormatter)
+          val time = dateTime.atZone(ZoneId.of("Europe/Stockholm")).toEpochSecond * 1000
           val price = parts(4).toDouble
           storage.save(
             "shares",
