@@ -16,6 +16,7 @@ trait ScalaConfigReaderInstances {
         case "coinbase"  => c.as[CoinbaseJob.Config].map(new CoinbaseJob(_))
         case "ethermine" => c.as[EthermineJob.Config].map(new EthermineJob(_))
         case "evoshares" => c.as[EvoSharesJob.Config].map(new EvoSharesJob(_))
+        case "ss" => c.as[SSJob.Config].map(new SSJob(_))
         case other       => Left(Seq(new IllegalStateException(s"Job type '$other' is unsupported")))
       }
     })
