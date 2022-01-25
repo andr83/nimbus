@@ -25,7 +25,10 @@ class SSJob(config: SSJob.Config) extends Job {
       () => {
         try {
           logger.info(s"Starting task: ${config.name}")
-          val doc = Jsoup.connect(config.url).get
+          val doc = Jsoup
+            .connect(config.url)
+            .requestBody(config.query)
+            .post()
           val items = doc.getElementById("head_line").parent().select("tr").asScala.tail.toList
           val matched = items
             .map { e =>
@@ -54,7 +57,7 @@ class SSJob(config: SSJob.Config) extends Job {
           matched foreach (i => logger.info(i.toString))
           matched foreach (i => {
             val text = s"[${config.name}] ${i.url} / ${i.price}€"
-            val url = uri"https://api.telegram.org/bot${config.apiKey}/sendMessage?chat_id=@andr83nimbus&text=$text"
+            val url = uri"https://api.telegram.org/bot${config.apiKey}/sendMessage?chat_id=-1001365615946&text=$text"
             val res = sttp.get(url).send()
             logger.info(res.unsafeBody)
           })
@@ -73,6 +76,7 @@ object SSJob {
 
   case class Config(name: String,
                     url: String,
+                    query: String,
                     minPrice: Double,
                     maxPrice: Double,
                     every: FiniteDuration,
